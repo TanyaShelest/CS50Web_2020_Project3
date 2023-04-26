@@ -1,3 +1,33 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
 textarea {
     min-height: 400px;
+}
+
+tbody tr {
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+td,
+th {
+    vertical-align: middle;
+}
+
+.unread {
+    font-weight: bolder;
+    background-color: #f0fbff;
+}
+
+table {
+    margin-top: 0px;
+    box-shadow: 5px 5px 5px rgb(199, 199, 199);
+}
+
+.wrapper {
+    height: 30px;
+    background-color: #587d92;
 }
