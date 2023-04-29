@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function compose_email() {
   // Show compose view and hide other views
-  document.querySelector("#emails-view").style.display = "none"
+  document.querySelector("#mailbox-view").style.display = "none"
   document.querySelector("#compose-view").style.display = "block"
 
   // Clear out composition fields
@@ -43,7 +43,6 @@ function send_email(e) {
   })
     .then((response) => response.json())
     .then((result) => {
-      console.log(result)
       if ("error" in result) {
         alert(result.error)
       } else {
@@ -53,62 +52,62 @@ function send_email(e) {
 }
 
 function load_mailbox(mailbox) {
+  let mailboxView = document.querySelector("#mailbox-view")
+  mailboxView.style.display = "block"
+  // // Show the mailbox name
+  mailboxView.querySelector("h3").innerText = `${
+    mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
+  }`
   // Show the mailbox and hide other views
-  document.querySelector("#emails-view").style.display = "block"
   document.querySelector("#compose-view").style.display = "none"
   document.querySelector("#single-email-view").style.display = "none"
-
-  document.querySelector("#emails-view").innerHTML = ""
-  // Show the mailbox name
-  document.querySelector("#emails-view").innerHTML = `<h3>${
-    mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
-  }</h3>`
-
-  let mailList = document.createElement("table")
-  mailList.classList.add("table", "table-bordered")
-  let header = document.createElement("thead")
-  header.classList.add("table-secondary")
-  header.innerHTML = "<tr><th>From</th><th>Subject</th><th>When</th></tr>"
-  mailList.append(header)
-  let listContent = document.createElement("tbody")
-  mailList.append(listContent)
+  document.querySelector("#empty-mailbox-alert").style.display = "none"
+  document.querySelector("#mailbox-content").style.display = "none"
 
   // Update the mailbox with the latest emails to show for this mailbox.
   fetch(`/emails/${mailbox}`)
     .then((response) => response.json())
     .then((emails) => {
       if (emails.length == 0) {
-        document.querySelector("#emails-view").innerHTML =
-          "<div class='alert alert-secondary' role='alert'>The mailbox is empty</div>"
-        return
-      }
-
-      emails.forEach((email) => {
-        let row = document.createElement("tr")
-        if (!email.read) {
-          row.classList.add("unread")
-        }
-        row.innerHTML = `<td>${email.sender}</td>
+        document.querySelector("#empty-mailbox-alert").style.display = "block"
+      } else {
+        document.querySelector("#mailbox-content").style.display = "table"
+        let listContent = mailboxView.querySelector("tbody")
+        listContent.innerHTML = ""
+        emails.forEach((email) => {
+          let row = document.createElement("tr")
+          if (!email.read) {
+            row.classList.add("unread")
+          }
+          row.innerHTML = `<td>${email.sender}</td>
                         <td class="email-subject">${email.subject}</td>
                         <td>${email.timestamp}</td>`
 
-        listContent.append(row)
+          listContent.append(row)
 
-        row.addEventListener("click", (e) => {
-          view_email(email, mailbox)
+          row.addEventListener("click", (e) => {
+            view_email(email, mailbox)
+          })
         })
-
-        document.querySelector("#emails-view").append(mailList)
-      })
+      }
     })
 }
 
 function view_email(email, mailbox) {
   document.getElementById("compose-view").style.display = "none"
-  document.getElementById("emails-view").style.display = "none"
+  document.getElementById("mailbox-view").style.display = "none"
 
   let emailView = document.getElementById("single-email-view")
   emailView.style.display = "block"
+  emailView.insertAdjacentHTML(
+    "afterbegin",
+    `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`
+  )
+  let archiveButton = document.getElementById("archive-button")
+
+  if (mailbox === "sent") {
+    archiveButton.style.display = "none"
+  }
 
   fetch(`/emails/${email.id}`)
     .then((response) => response.json())
@@ -134,8 +133,8 @@ function view_email(email, mailbox) {
   let replyButton = document.getElementById("reply-button")
   replyButton.addEventListener("click", () => reply(email))
 
-  let archiveButton = document.getElementById("archive-button")
-  archiveButton.textContent = mailbox === "archive" ? "Unarchive" : "Archive"
+  // archiveButton.textContent = mailbox === "archive" ? "Unarchive" : "Archive"
+  archiveButton.textContent = email.archived ? "Unarchive" : "Archive"
 
   archiveButton.addEventListener("click", () =>
     archive(email.id, email.archived)
@@ -168,5 +167,5 @@ function archive(id, archived) {
     body: JSON.stringify({
       archived: !archived,
     }),
-  }).then(load_mailbox("inbox"))
+  }).then(location.reload())
 }
