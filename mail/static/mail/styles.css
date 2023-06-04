@@ -8,7 +8,7 @@ textarea {
 }
 
 tbody tr {
-    background-color: #ffffff;
+    background-color: #f5f2f2ee;
     cursor: pointer;
 }
 
@@ -19,7 +19,7 @@ th {
 
 .unread {
     font-weight: bolder;
-    background-color: #f0fbff;
+    background-color: #ffffff !important;
 }
 
 table {
