@@ -18,13 +18,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function compose_email() {
   // Show compose view and hide other views
+  let form = document.querySelector("#compose-view")
+  form.style.display = "block"
   document.querySelector("#mailbox-view").style.display = "none"
-  document.querySelector("#compose-view").style.display = "block"
+
+  form.querySelector("h3").textContent = "New Email"
 
   // Clear out composition fields
-  document.querySelector("#compose-recipients").value = ""
-  document.querySelector("#compose-subject").value = ""
-  document.querySelector("#compose-body").value = ""
+  form.querySelector("#compose-recipients").value = ""
+  form.querySelector("#compose-recipients").disabled = false
+  form.querySelector("#compose-subject").value = ""
+  form.querySelector("#compose-body").value = ""
 }
 
 function send_email(e) {
@@ -64,7 +68,7 @@ function load_mailbox(mailbox) {
   document.querySelector("#empty-mailbox-alert").style.display = "none"
   document.querySelector("#mailbox-content").style.display = "none"
 
-  // Update the mailbox with the latest emails to show for this mailbox.
+  // Update the mailbox with the latest emails to show for this mailbox
   fetch(`/emails/${mailbox}`)
     .then((response) => response.json())
     .then((emails) => {
@@ -167,5 +171,8 @@ function archive(id, archived) {
     body: JSON.stringify({
       archived: !archived,
     }),
-  }).then(location.reload())
+  }).then((response) => console.log(response))
+
+  // location.reload()
+  load_mailbox("inbox")
 }
