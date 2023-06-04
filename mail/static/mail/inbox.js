@@ -103,10 +103,10 @@ function view_email(email, mailbox) {
 
   let emailView = document.getElementById("single-email-view")
   emailView.style.display = "block"
-  emailView.insertAdjacentHTML(
-    "afterbegin",
-    `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`
-  )
+  emailView.querySelector("h3").textContent = `${
+    mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
+  }`
+
   let archiveButton = document.getElementById("archive-button")
 
   if (mailbox === "sent") {
